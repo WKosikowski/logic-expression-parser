@@ -5,20 +5,20 @@
 //  Created by Wojciech Kosikowski on 27/10/2024.
 //
 
-class ReversePolishNotation {
-    
-    // out = A *(A + B + C)+  B
- 
-    func makeNotation(input: inout [Token]) -> [Token]{
-        
-        var stack: [Token] = []
-        var rpn: [Token] = []
-        var prefix: [Token] = []
+typealias Expression = [Token]
+
+struct LogicRPN {
+
+    func makeNotation(input: inout Expression) -> Expression {
+
+        var stack: Expression = []
+        var rpn: Expression = []
+        var prefix: Expression = []
         if input[0].type == .Operand && input[1].type == .Equal {
             prefix = [input[0], input[1]]
             input.removeFirst(2)
         }
-        
+
         while !input.isEmpty {
             let token = input.removeFirst()
 
@@ -34,28 +34,27 @@ class ReversePolishNotation {
                 // return rpn
                 return rpn
             }
-            
-            if token.type == TokenType.Operand{
+
+            if token.type == TokenType.Operand {
                 rpn.append(token)
-            }
-            else if token.type == TokenType.Operator{
-                if stack.isEmpty{
+            } else if token.type == TokenType.Operator {
+                if stack.isEmpty {
                     stack.append(token)
-                }
-                else if let lastToken = stack.last, lastToken.value == "~" ||
-                            lastToken.value == "*" && (token.value == "*" || token.value == "+") ||
-                            lastToken.value == token.value
+                } else if let lastToken = stack.last,
+                    lastToken.value == "~"
+                        || lastToken.value == "*"
+                            && (token.value == "*" || token.value == "+")
+                        || lastToken.value == token.value
                 {
                     rpn.append(contentsOf: stack.reversed())
-                stack.removeAll()
+                    stack.removeAll()
                     stack.append(token)
-                }
-                else {
+                } else {
                     stack.append(token)
                 }
             }
         }
-        
+
         // przeniesc stack to rpn
         rpn.append(contentsOf: stack.reversed())
         return prefix + rpn

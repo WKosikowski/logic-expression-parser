@@ -33,3 +33,5 @@ extension Token: CustomDebugStringConvertible {
         "[\(self.value) \(self.type)]"
     }
 }
+
+extension Token: Hashable {}
