@@ -51,7 +51,7 @@ struct RPNTests {
             Token(value: "+", type: .Operator),
             Token(value: "d", type: .Operand),
             Token(value: "c", type: .Operand),
-            Token(value: "f", type: .Operator),
+            Token(value: "f", type: .Operand),
             Token(value: "+", type: .Operator),
             Token(value: "*", type: .Operator),
             Token(value: "+", type: .Operator)

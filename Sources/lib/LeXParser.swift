@@ -59,7 +59,7 @@ public struct Parser{
                 if previousTokenType == TokenType.BracketOpen && token.type == TokenType.BracketClose {
                     throw ParserError.invalidSyntax(index: index, message: "Invalid syntax. Empty brackets.")
                 }
-                if previousTokenType != TokenType.Operand && token.type == TokenType.BracketClose {
+                if previousTokenType != TokenType.Operand && previousTokenType != TokenType.BracketClose && token.type == TokenType.BracketClose {
                     throw ParserError.invalidSyntax(index: index, message: "Invalid syntax. Only operands allowed before closing a bracket")
                 }
                     if previousTokenType == TokenType.Equal && token.type != TokenType.BracketOpen && token.type != TokenType.Operand && token.value != "~" {
