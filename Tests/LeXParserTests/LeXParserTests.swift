@@ -36,6 +36,16 @@ struct LeXParserTests {
                     Token(value: "B", type: TokenType.Operand),
                 ]),
             TestData(
+                input: "out1=A*~B",
+                output: [
+                    Token(value: "out1", type: TokenType.Operand),
+                    Token(value: "=", type: TokenType.Equal),
+                    Token(value: "A", type: TokenType.Operand),
+                    Token(value: "*", type: TokenType.Operator),
+                    Token(value: "~", type: TokenType.Operator),
+                    Token(value: "B", type: TokenType.Operand),
+                ]),
+            TestData(
                 input: "out1=(Ab*B)",
                 output: [
                     Token(value: "out1", type: TokenType.Operand),
@@ -79,6 +89,16 @@ struct LeXParserTests {
                 error: .invalidSyntax(index: 1, message: "Invalid syntax. The first element should be an Operand, then an Equal sign, followed by the formula.")
             ),
             ParserTestData(
+                input: "out1=A++B",
+                output: [],
+                error: .invalidSyntax(index: 4, message: "Invalid syntax. Only operands and bracket closures allowed before a two sided operator.")
+            ),
+            ParserTestData(
+                input: "out1=A~+B",
+                output: [],
+                error: .invalidSyntax(index: 4, message: "Invalid syntax. Only operands and bracket closures allowed before a two sided operator.")
+            ),
+            ParserTestData(
                 input: "out1=)Ab*B)",
                 output: [],
                 error: .invalidSyntax(index: 2, message: "Premature bracket closure.")
@@ -96,7 +116,7 @@ struct LeXParserTests {
             ParserTestData(
                 input: "out1=(+)",
                 output: [],
-                error: .invalidSyntax(index: 3, message: "Invalid syntax. Only operands and bracket closures allowed before an operator.")
+                error: .invalidSyntax(index: 3, message: "Invalid syntax. Only operands and bracket closures allowed before a two sided operator.")
             ),
             ParserTestData(
                 input: "out1=(a+)",
@@ -107,6 +127,11 @@ struct LeXParserTests {
                 input: "out1==bb+cc",
                 output: [],
                 error: .invalidSyntax(index: 2, message: "Invalid syntax. Only operands, opening brackets and negation is allowed after Equal sign.")
+            ),
+            ParserTestData(
+                input: "out1=((a+b)",
+                output: [],
+                error: .invalidSyntax(index: 7, message: "Invalid syntax. Brackets were left opened and were never closed.")
             ),
         ])
     func testParserErroneousInput(testData: ParserTestData) throws {
