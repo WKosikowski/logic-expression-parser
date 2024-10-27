@@ -12,10 +12,7 @@ import LeXParser
 
 @main
 struct Repeat: ParsableCommand {
-//    @Argument(help: "The phrase to repeat.")
-//    var phrase: String
-//    
-    
+
     @Option(help: "Signle line logic expressiono")
     var singleLine: String
     
@@ -25,9 +22,9 @@ struct Repeat: ParsableCommand {
 //    var many: String
     
     mutating func run() throws {
-        print(singleLine)
+
         let parser = Parser()
         let result = try parser.parse(input: singleLine)
-        print(result)
+        print("Syntax OK")
     }
 }

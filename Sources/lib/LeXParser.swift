@@ -5,11 +5,22 @@
 //  Created by Wojciech Kosikowski on 25/10/2024.
 //
 
+import Foundation
+
 
 
 public enum ParserError: Error, Equatable {
     case invalidSyntax(index: Int, message: String)
-    case bracketError(message: String) // a to nie jest syntax error?
+}
+
+extension ParserError: LocalizedError {
+    
+    public var errorDescription: String? {
+        switch self {
+            case let .invalidSyntax(_, message):
+                return message
+        }
+    }
 }
 
 
@@ -26,8 +37,9 @@ public struct Parser{
             tokens.append(token)
             index += 1
             if token.type == TokenType.Invalid{
-                throw ParserError.invalidSyntax(index: index, message: "Invalid syntax. This character is not allowed.")
+                throw ParserError.invalidSyntax(index: index, message: "\"\(token.value)\" character at position \(index) is not allowed.")
             }
+            
             if index > 1{
                 if token.type == TokenType.BracketOpen{
                     bracketLevel += 1
@@ -38,13 +50,10 @@ public struct Parser{
                 if bracketLevel < 0{
                     throw ParserError.invalidSyntax(index: index, message: "Premature bracket closure.")
                 }
-                if token.type == TokenType.Operator && (previousTokenType != TokenType.Operand && previousTokenType != TokenType.BracketClose) {
-                    throw ParserError.invalidSyntax(index: index, message: "Invalid syntax. Only operands and bracket closures allowed before an operator.")
+                if token.type == TokenType.Operator && (previousTokenType != TokenType.Operand && previousTokenType != TokenType.BracketClose && token.value != "~") {
+                    throw ParserError.invalidSyntax(index: index, message: "Invalid syntax. Only operands and bracket closures allowed before a two sided operator.")
                 }
-                if previousTokenType == TokenType.Operator && token.type == TokenType.Operator && token.value != "~"{
-                    throw ParserError.invalidSyntax(index: index, message: "Invalid syntax. Can not place two-sided operators net to each other.")
-                }
-                if previousTokenType != TokenType.Operator && token.type == TokenType.BracketOpen && previousTokenType != TokenType.Equal {
+                if previousTokenType != TokenType.Operator && token.type == TokenType.BracketOpen && previousTokenType != TokenType.Equal && previousTokenType != TokenType.BracketOpen {
                     throw ParserError.invalidSyntax(index: index, message: "Invalid syntax. Can only place operators before opening a bracket.")
                 }
                 if previousTokenType == TokenType.BracketOpen && token.type == TokenType.BracketClose {
@@ -53,7 +62,7 @@ public struct Parser{
                 if previousTokenType != TokenType.Operand && token.type == TokenType.BracketClose {
                     throw ParserError.invalidSyntax(index: index, message: "Invalid syntax. Only operands allowed before closing a bracket")
                 }
-                if previousTokenType == TokenType.Equal && token.type != TokenType.BracketOpen && token.type != TokenType.Operand && token.value != "~" {
+                    if previousTokenType == TokenType.Equal && token.type != TokenType.BracketOpen && token.type != TokenType.Operand && token.value != "~" {
                     throw ParserError.invalidSyntax(index: index, message: "Invalid syntax. Only operands, opening brackets and negation is allowed after Equal sign.")
                 }
             }
@@ -67,15 +76,16 @@ public struct Parser{
             }
             previousTokenType = token.type
         }
-        if bracketLevel != 0{
-            throw ParserError.bracketError(message: "Too many or too little brackets.")
+        if bracketLevel > 0{
+            throw ParserError
+                .invalidSyntax(
+                    index: index,
+                    message: "Invalid syntax. Brackets were left opened and were never closed."
+                )
         }
         
         return tokens
     }
     
-    //    func nextToken() throws -> Token ? {
-    //        nil
-    //    }
 }
 
