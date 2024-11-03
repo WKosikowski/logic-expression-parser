@@ -7,7 +7,9 @@
 import Darwin
 
 public struct LogicRPNCalculator {
+
     public init() {}
+
     public func calculateOne(expression: Expression, input: [Token: Bool])
         -> Bool
     {
@@ -93,6 +95,7 @@ public struct LogicRPNCalculator {
             return false
         }
     }
+
     class PermutationList {
         var firstNode: PermutationNode?
 
@@ -123,6 +126,8 @@ public struct LogicRPNCalculator {
 
         }
 
+        @inline(__always)
+        @_optimize(speed)
         func getNextPermutationDictionary() -> [Token: Bool] {
             var result: [Token: Bool] = [:]
             var current = firstNode
@@ -156,6 +161,8 @@ public struct LogicRPNCalculator {
             nextNode?.getLast() ?? self
         }
 
+        @inline(__always)
+        @_optimize(speed)
         func increment() {
             value.toggle()
             if !value {
@@ -164,6 +171,7 @@ public struct LogicRPNCalculator {
         }
     }
 
+    @_optimize(speed)
     public func printTruthTable(formula: Formula) -> String {
         var printString = ""
         let permutationsList = PermutationList(formula: formula)
@@ -179,6 +187,9 @@ public struct LogicRPNCalculator {
         printString += "  \(formula.output.value)\n"
 
         for c in 0...permutationsList.permutations - 1 {
+//            print(
+//                "\(100*Double(c)/Double(permutationsList.permutations))% done ",
+//                terminator: "\r")
             printString += "\(c) | "
             let inValues = permutationsList.getNextPermutationDictionary()
             let result = calculateOne(
