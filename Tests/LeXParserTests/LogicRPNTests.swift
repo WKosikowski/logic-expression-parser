@@ -14,6 +14,7 @@ struct RPNTestData {
     let output: [Token]
 }
 
+@Suite("RPN Converter")
 struct RPNTests {
 
     @Test(
@@ -61,7 +62,7 @@ struct RPNTests {
         ])
     func testRPN(data: RPNTestData) async throws {
         let parser = Parser()
-        var expression = try parser.parse(input: data.input).expression  // reeturn expression
+        var expression = try parser.parse(input: data.input).expression
         let rpn = LogicRPN().makeNotation(input: &expression)
         #expect(data.output == rpn)
     }

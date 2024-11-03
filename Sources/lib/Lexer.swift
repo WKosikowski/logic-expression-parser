@@ -12,21 +12,21 @@ struct Lexer {
 
     init(
         validSymbols: String =
-            "abcdefghijklomnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890*+()",
+            "abcdefghijklomnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890*+()",  // list of allowed characters usable in the Lexer.
         input: String
     ) {
         self.validSymbols = validSymbols
         self.input = input
-        self.nextTokenIndex = self.input.startIndex
+        self.nextTokenIndex = self.input.startIndex  // used in nextToken(). it is the index of the current character being tokenized.
     }
 
     private var inStack: String = ""
 
     mutating
-        func nextToken() -> Token?
+        func nextToken() -> Token?  // takes the charater at self.nextTokenIndex from self.input and returns it as a token
     {
 
-        var token: Token? = nil
+        var token: Token? = nil  // created token to be returned
 
         while token == nil {
             guard self.nextTokenIndex < self.input.endIndex else {
@@ -36,27 +36,27 @@ struct Lexer {
             let char = input[nextTokenIndex]
 
             switch char {
-            case "+", "*", "~":
+            case "+", "*", "~":  // operator
                 token =
                     makeOperand()
                     ?? Token(value: String(char), type: TokenType.Operator)
-            case "=":
+            case "=":  // equals
                 token =
                     makeOperand()
                     ?? Token(value: String(char), type: TokenType.Equal)
-            case "(":
+            case "(":  // bracket open
                 token =
                     makeOperand()
                     ?? Token(value: String(char), type: TokenType.BracketOpen)
-            case ")":
+            case ")":  // bracket close
                 token =
                     makeOperand()
                     ?? Token(value: String(char), type: TokenType.BracketClose)
-            default:
-                if validSymbols.contains(char) {
+            default:  // operand
+                if validSymbols.contains(char) {  // valid character
                     inStack += String(char)
                     nextTokenIndex = input.index(after: nextTokenIndex)
-                } else {
+                } else {  // invalid character
                     token =
                         makeOperand()
                         ?? Token(value: String(char), type: TokenType.Invalid)
@@ -71,7 +71,7 @@ struct Lexer {
 
     mutating
         private func makeOperand() -> Token?
-    {
+    {  // tokenizes the operand
         if !inStack.isEmpty {
             let token = Token(
                 value: String(inStack),

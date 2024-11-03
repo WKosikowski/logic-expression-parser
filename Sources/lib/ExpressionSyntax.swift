@@ -6,7 +6,13 @@
 //
 
 public struct Formula {
-    let output: Token
-    let expression: [Token]
-    let value: Bool?
+    public let output: Token
+    public let expression: [Token]
+    public let value: Bool?
+
+    public init(output: Token, expression: [Token], value: Bool?) {
+        self.output = output
+        self.expression = expression
+        self.value = value
+    }
 }

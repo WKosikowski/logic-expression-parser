@@ -90,7 +90,7 @@ struct LeXParserTests {
                 error: .invalidSyntax(
                     index: 4,
                     message:
-                        "Invalid syntax. Only operands and bracket closures allowed before a two sided operator."
+                        "Invalid syntax. Only operands and bracket closures allowed in front of a two sided operator."
                 )
             ),
             ParserTestData(
@@ -99,7 +99,7 @@ struct LeXParserTests {
                 error: .invalidSyntax(
                     index: 4,
                     message:
-                        "Invalid syntax. Only operands and bracket closures allowed before a two sided operator."
+                        "Invalid syntax. Only operands and bracket closures allowed in front of a two sided operator."
                 )
             ),
             ParserTestData(
@@ -129,7 +129,7 @@ struct LeXParserTests {
                 error: .invalidSyntax(
                     index: 3,
                     message:
-                        "Invalid syntax. Only operands and bracket closures allowed before a two sided operator."
+                        "Invalid syntax. Only operands and bracket closures allowed in front of a two sided operator."
                 )
             ),
             ParserTestData(
@@ -159,11 +159,6 @@ struct LeXParserTests {
                         "Invalid syntax. Brackets were left opened and were never closed."
                 )
             ),
-            //            ParserTestData(
-            //                input: "out1=",
-            //                output: [],
-            //                error: .invalidSyntax(index: 7, message: "Invalid syntax. Brackets were left opened and were never closed.")
-            //            ),
         ])
     func testParserErroneousInput(testData: ParserTestData) throws {
         let parser = Parser()

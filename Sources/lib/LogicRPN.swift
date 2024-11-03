@@ -5,11 +5,11 @@
 //  Created by Wojciech Kosikowski on 27/10/2024.
 //
 
-typealias Expression = [Token]
+public typealias Expression = [Token]
 
-struct LogicRPN {
-
-    func makeNotation(input: inout Expression) -> Expression {
+public struct LogicRPN {
+    public init() {}
+    public func makeNotation(input: inout Expression) -> Expression {
 
         var stack: Expression = []
         var rpn: Expression = []
@@ -23,15 +23,11 @@ struct LogicRPN {
             let token = input.removeFirst()
 
             if token.type == .BracketOpen {
-                // wywoluje rekursje
                 let inBrackets = makeNotation(input: &input)
-                // add inBrackets to rpn
                 rpn += inBrackets
             } else if token.type == .BracketClose {
-                //move all from stack to rpn
                 rpn.append(contentsOf: stack.reversed())
                 stack.removeAll()
-                // return rpn
                 return rpn
             }
 
@@ -54,8 +50,6 @@ struct LogicRPN {
                 }
             }
         }
-
-        // przeniesc stack to rpn
         rpn.append(contentsOf: stack.reversed())
         return prefix + rpn
     }

@@ -8,23 +8,28 @@
 import ArgumentParser
 import LeXParser
 
-
-
 @main
 struct Repeat: ParsableCommand {
 
-    @Option(help: "Signle line logic expressiono")
+    @Option(help: "Signle line logic expression")
     var singleLine: String
-    
-//    //A2=B*C+~D \n
-//    //A1=B*C+~D
-//    @Option(help: "Many...")
-//    var many: String
-    
+
     mutating func run() throws {
 
-        let parser = Parser()
-        let result = try parser.parse(input: singleLine)
+        let result = try Parser().parse(input: singleLine)
+        print(singleLine)
         print("Syntax OK")
+        var resultExpression = result.expression
+        let rpnResults = LogicRPN().makeNotation(input: &resultExpression)
+        let RPNCalc = LogicRPNCalculator()
+        print(
+            RPNCalc
+                .printTruthTable(
+                    formula: Formula(
+                        output: result.output,
+                        expression: rpnResults,
+                        value: nil
+                    )
+                ))
     }
 }
