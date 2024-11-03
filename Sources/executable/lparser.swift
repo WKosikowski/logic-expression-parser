@@ -9,7 +9,13 @@ import ArgumentParser
 import LeXParser
 
 @main
-struct Repeat: ParsableCommand {
+struct LeXParserCommand: ParsableCommand {
+
+    static let configuration = CommandConfiguration(
+        commandName: "LeXParser",
+        abstract:
+            "Logic eXpression Parser - to parse logical formula and print the truth table."
+    )
 
     @Option(help: "Signle line logic expression")
     var singleLine: String
