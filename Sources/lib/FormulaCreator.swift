@@ -12,6 +12,12 @@
 /// 10|01
 /// 11|00
 struct FormulaCreator {
+    private let simplifier: LogicSimplifier?
+    
+    init(simplifier: LogicSimplifier? = nil) {
+        self.simplifier = simplifier
+    }
+    
     /// Creates formulas from a truth table string
     /// - Parameter table: String containing truth table with inputs and outputs separated by '|'
     /// - Returns: Array of Formula objects, one for each output column
@@ -31,9 +37,15 @@ struct FormulaCreator {
         let outputs = Array(parts[1])
         
         // Create a formula for each output column
-        return (0..<outputs.count).map { outputIndex in
+        let formulas = (0..<outputs.count).map { outputIndex in
             createSingleFormula(instances: instances, outputIndex: outputIndex)
         }
+        
+        // Apply simplification if configured
+        if let simplifier = simplifier {
+            return formulas.map { simplifier.simplify($0) }
+        }
+        return formulas
     }
     
     /// Creates a single formula for one output column
