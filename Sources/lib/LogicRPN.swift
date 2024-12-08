@@ -8,49 +8,71 @@
 public typealias Expression = [Token]
 
 public struct LogicRPN {
+    private let operatorPrecedence: [String: Int] = [
+        "~": 3,  // NOT has highest precedence
+        "*": 2,  // AND
+        "+": 1   // OR
+    ]
+    
     public init() {}
+    
     public func makeNotation(input: inout Expression) -> Expression {
-
+        // Handle assignment prefix (if exists)
+        let prefix = extractAssignmentPrefix(from: &input)
+        let rpn = convertToRPN(&input)
+        return prefix + rpn
+    }
+    
+    private func extractAssignmentPrefix(from input: inout Expression) -> Expression {
+        guard input.count >= 2,
+              input[0].type == .Operand,
+              input[1].type == .Equal else {
+            return []
+        }
+        
+        let prefix = Array(input.prefix(2))
+        input.removeFirst(2)
+        return prefix
+    }
+    
+    private func convertToRPN(_ input: inout Expression) -> Expression {
         var stack: Expression = []
         var rpn: Expression = []
-        var prefix: Expression = []
-        if input[0].type == .Operand && input[1].type == .Equal {
-            prefix = [input[0], input[1]]
-            input.removeFirst(2)
-        }
-
+        
         while !input.isEmpty {
             let token = input.removeFirst()
-
-            if token.type == .BracketOpen {
-                let inBrackets = makeNotation(input: &input)
-                rpn += inBrackets
-            } else if token.type == .BracketClose {
-                rpn.append(contentsOf: stack.reversed())
-                stack.removeAll()
-                return rpn
-            }
-
-            if token.type == TokenType.Operand {
+            
+            switch token.type {
+            case .Operand:
                 rpn.append(token)
-            } else if token.type == TokenType.Operator {
-                if stack.isEmpty {
-                    stack.append(token)
-                } else if let lastToken = stack.last,
-                    lastToken.value == "~"
-                        || lastToken.value == "*"
-                            && (token.value == "*" || token.value == "+")
-                        || lastToken.value == token.value
-                {
-                    rpn.append(contentsOf: stack.reversed())
-                    stack.removeAll()
-                    stack.append(token)
-                } else {
-                    stack.append(token)
+                
+            case .BracketOpen:
+                stack.append(token)
+                
+            case .BracketClose:
+                while let top = stack.last, top.type != .BracketOpen {
+                    rpn.append(stack.removeLast())
                 }
+                _ = stack.popLast() // Remove the opening bracket
+                
+            case .Operator:
+                while let top = stack.last,
+                      top.type == .Operator,
+                      let topPrec = operatorPrecedence[top.value],
+                      let currentPrec = operatorPrecedence[token.value],
+                      topPrec >= currentPrec {
+                    rpn.append(stack.removeLast())
+                }
+                stack.append(token)
+                
+            default:
+                continue
             }
         }
+        
+        // Add remaining operators to output
         rpn.append(contentsOf: stack.reversed())
-        return prefix + rpn
+        
+        return rpn
     }
 }
