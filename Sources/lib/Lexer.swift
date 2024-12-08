@@ -5,28 +5,31 @@
 //  Created by Wojciech Kosikowski on 26/10/2024.
 //
 
+import Foundation
+
 struct Lexer {
-    private let validSymbols: String
+    private let validPattern: NSRegularExpression
     private var nextTokenIndex: String.Index
     private var input: String
 
     init(
-        validSymbols: String =
-            "abcdefghijklomnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890*+()",  // list of allowed characters usable in the Lexer.
+        pattern: String = "[a-zA-Z0-9*+()]",  // Default regex pattern for allowed characters
         input: String
     ) {
-        self.validSymbols = validSymbols
+        do {
+            self.validPattern = try NSRegularExpression(pattern: pattern, options: [])
+        } catch {
+            // Fallback to a very basic pattern if the provided one is invalid
+            self.validPattern = try! NSRegularExpression(pattern: "[a-zA-Z0-9]", options: [])
+        }
         self.input = input
-        self.nextTokenIndex = self.input.startIndex  // used in nextToken(). it is the index of the current character being tokenized.
+        self.nextTokenIndex = self.input.startIndex
     }
 
     private var inStack: String = ""
 
-    mutating
-        func nextToken() -> Token?  // takes the charater at self.nextTokenIndex from self.input and returns it as a token
-    {
-
-        var token: Token? = nil  // created token to be returned
+    mutating func nextToken() -> Token? {
+        var token: Token? = nil
 
         while token == nil {
             guard self.nextTokenIndex < self.input.endIndex else {
@@ -37,32 +40,23 @@ struct Lexer {
 
             switch char {
             case "+", "*", "~":  // operator
-                token =
-                    makeOperand()
-                    ?? Token(value: String(char), type: TokenType.Operator)
+                token = makeOperand() ?? Token(value: String(char), type: TokenType.Operator)
             case "=":  // equals
-                token =
-                    makeOperand()
-                    ?? Token(value: String(char), type: TokenType.Equal)
+                token = makeOperand() ?? Token(value: String(char), type: TokenType.Equal)
             case "(":  // bracket open
-                token =
-                    makeOperand()
-                    ?? Token(value: String(char), type: TokenType.BracketOpen)
+                token = makeOperand() ?? Token(value: String(char), type: TokenType.BracketOpen)
             case ")":  // bracket close
-                token =
-                    makeOperand()
-                    ?? Token(value: String(char), type: TokenType.BracketClose)
+                token = makeOperand() ?? Token(value: String(char), type: TokenType.BracketClose)
             default:  // operand
-                if validSymbols.contains(char) {  // valid character
-                    inStack += String(char)
+                let charString = String(char)
+                let range = NSRange(location: 0, length: charString.utf16.count)
+                if validPattern.firstMatch(in: charString, options: [], range: range) != nil {
+                    inStack += charString
                     nextTokenIndex = input.index(after: nextTokenIndex)
                 } else {  // invalid character
-                    token =
-                        makeOperand()
-                        ?? Token(value: String(char), type: TokenType.Invalid)
+                    token = makeOperand() ?? Token(value: String(char), type: TokenType.Invalid)
                 }
             }
-
         }
 
         self.nextTokenIndex = self.input.index(after: nextTokenIndex)
