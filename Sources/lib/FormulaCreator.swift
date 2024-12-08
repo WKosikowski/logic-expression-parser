@@ -17,11 +17,19 @@ struct FormulaCreator {
     /// - Returns: Array of Formula objects, one for each output column
     func createFormula(table: String) -> [Formula] {
         let instances = table.split(separator: "\n")
+        
         // Return empty array if table is empty
-        guard let firstInstance = instances.first else { return [] }
+        guard let firstInstance = instances.first,
+              !firstInstance.isEmpty else { return [] }
+        
+        // Split first row and validate format
+        let parts = firstInstance.split(separator: "|")
+        guard parts.count >= 2,
+              !parts[1].isEmpty else { return [] }
         
         // Get number of outputs from first row
-        let outputs = Array(firstInstance.split(separator: "|")[1])
+        let outputs = Array(parts[1])
+        
         // Create a formula for each output column
         return (0..<outputs.count).map { outputIndex in
             createSingleFormula(instances: instances, outputIndex: outputIndex)
