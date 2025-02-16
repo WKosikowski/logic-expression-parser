@@ -13,9 +13,14 @@
 /// 11|00
 struct FormulaCreator {
     private let simplifier: LogicSimplifier?
+    private let optimizer: LogicOptimizer?
     
-    init(simplifier: LogicSimplifier? = nil) {
+    init(
+        simplifier: LogicSimplifier? = nil,
+        optimizer: LogicOptimizer? = nil
+    ) {
         self.simplifier = simplifier
+        self.optimizer = optimizer
     }
     
     /// Creates formulas from a truth table string
@@ -37,14 +42,20 @@ struct FormulaCreator {
         let outputs = Array(parts[1])
         
         // Create a formula for each output column
-        let formulas = (0..<outputs.count).map { outputIndex in
+        var formulas = (0..<outputs.count).map { outputIndex in
             createSingleFormula(instances: instances, outputIndex: outputIndex)
         }
         
         // Apply simplification if configured
         if let simplifier = simplifier {
-            return formulas.map { simplifier.simplify($0) }
+            formulas = formulas.map { simplifier.simplify($0) }
         }
+        
+        // Apply optimization if configured
+        if let optimizer = optimizer {
+            formulas = formulas.map { optimizer.optimize($0) }
+        }
+        
         return formulas
     }
     

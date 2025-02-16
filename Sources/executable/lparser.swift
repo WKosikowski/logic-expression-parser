@@ -7,17 +7,19 @@
 
 import ArgumentParser
 import Foundation
-import LeXParser
+@testable import LeXParser
 
 /// Command-line interface for the Logic Expression Parser
 @main
 struct LeXParserCommand: ParsableCommand {
-    static var configuration = CommandConfiguration(
-        commandName: "lparser",
-        abstract: "A tool for parsing and simplifying logical expressions",
-        version: "1.0.0",
-        subcommands: [GenerateTable.self, CreateFormula.self]
-    )
+    static var configuration: CommandConfiguration {
+        CommandConfiguration(
+            commandName: "lparser",
+            abstract: "A tool for parsing and simplifying logical expressions",
+            version: "1.0.0",
+            subcommands: [GenerateTable.self, CreateFormula.self]
+        )
+    }
 }
 
 // MARK: - Subcommands
@@ -25,10 +27,12 @@ struct LeXParserCommand: ParsableCommand {
 /// Subcommand to generate truth table from logical expression
 extension LeXParserCommand {
     struct GenerateTable: ParsableCommand {
-        static var configuration = CommandConfiguration(
-            commandName: "table",
-            abstract: "Generate truth table from logical expression"
-        )
+        static var configuration: CommandConfiguration {
+            CommandConfiguration(
+                commandName: "table",
+                abstract: "Generate truth table from logical expression"
+            )
+        }
         
         @Argument(help: "Logical expression (e.g., 'Out = A + B * ~C')")
         var expression: String
@@ -38,7 +42,8 @@ extension LeXParserCommand {
         
         mutating func run() throws {
             // Parse the expression
-            let result = try Parser().parse(input: expression)
+            let parser = Parser()
+            let result = try parser.parse(input: expression)
             var resultExpression = result.expression
             
             // Convert to RPN and calculate
@@ -68,16 +73,21 @@ extension LeXParserCommand {
     }
     
     struct CreateFormula: ParsableCommand {
-        static var configuration = CommandConfiguration(
-            commandName: "formula",
-            abstract: "Create logical formula from truth table"
-        )
+        static var configuration: CommandConfiguration {
+            CommandConfiguration(
+                commandName: "formula",
+                abstract: "Create logical formula from truth table"
+            )
+        }
         
         @Option(name: .shortAndLong, help: "Input file path containing truth table")
         var input: String
         
         @Flag(name: .long, help: "Enable formula simplification")
         var simplify: Bool = false
+        
+        @Flag(name: .long, help: "Enable circuit optimization")
+        var optimize: Bool = false
         
         @Option(name: .long, help: "Output file path (optional)")
         var output: String?
@@ -87,12 +97,12 @@ extension LeXParserCommand {
         
         mutating func run() throws {
             // Read input file
-            let fileReader = try FileReader(path: input)
-            let content = try fileReader.read()
+            let content = try String(contentsOfFile: input, encoding: .utf8)
             
             // Create formulas from truth table
             let formulaCreator = FormulaCreator(
-                simplifier: simplify ? LogicSimplifier() : nil
+                simplifier: simplify ? LogicSimplifier() : nil,
+                optimizer: optimize ? LogicOptimizer() : nil
             )
             let formulas = formulaCreator.createFormula(table: content)
             
