@@ -145,14 +145,14 @@ This project is organized into a few focused modules under `Sources/lib` plus a 
 
 Key components and responsibilities:
 
-- `Lexer` (`Sources/lib/Lexer.swift`): Tokenizes input strings into `Token` instances (operands, operators, brackets, equals).
-- `Parser` / `LeXParser` (`Sources/lib/LeXParser.swift`): Validates token sequence and constructs a `Formula` (output token + expression token list).
-- `LogicRPN` (`Sources/lib/LogicRPN.swift`): Converts infix token lists to Reverse Polish Notation (RPN) respecting operator precedence (`~` > `*` > `+`).
-- `LogicRPNCalculator` (`Sources/lib/LogicRPNCalculator.swift`): Evaluates RPN expressions for all input permutations and prints formatted truth tables.
-- `FormulaCreator` (`Sources/lib/FormulaCreator.swift`): Produces DNF formulas from truth tables and can invoke `LogicSimplifier` and `LogicOptimizer`.
-- `LogicSimplifier` (`Sources/lib/LogicSimplifier.swift`): Applies boolean simplifications (idempotent and absorption implemented; complement and De Morgan noted as TODO).
-- `LogicOptimizer` (`Sources/lib/LogicOptimizer.swift`): Circuit-level optimization pass (refer to source for behavior).
-- Core types: `Token`, `Expression` (alias for `[Token]`), `Formula` (`Sources/lib/Token.swift`, `Sources/lib/ExpressionSyntax.swift`).
+- `Lexer`: Tokenizes input strings into `Token` instances (operands, operators, brackets, equals).
+- `Parser` / `LeXParser`: Validates token sequence and constructs a `Formula` (output token + expression token list).
+- `LogicRPN`: Converts infix token lists to Reverse Polish Notation (RPN) respecting operator precedence (`~` > `*` > `+`).
+- `LogicRPNCalculator`: Evaluates RPN expressions for all input permutations and prints formatted truth tables.
+- `FormulaCreator`: Produces DNF formulas from truth tables and can invoke `LogicSimplifier` and `LogicOptimizer`.
+- `LogicSimplifier`: Applies boolean simplifications (idempotent and absorption implemented; complement and De Morgan noted as TODO).
+- `LogicOptimizer`: Circuit-level optimization pass (refer to source for behavior).
+- Core types: `Token`, `Expression` (alias for `[Token]`), `Formula`.
 
 ## Mermaid Diagrams
 
@@ -226,39 +226,3 @@ swift test
 
 - Implement complement-law and De Morgan transformations in `LogicSimplifier`.
 - Improve token regex if you need to support additional characters or operators.
-- Add more documentation examples and exportable diagrams (SVG/PNG) for the README.
-
----
-
-If you want, I can (pick one):
-
-- run the test suite now, or
-- open a PR with this README update.
-
-Tell me which and I'll proceed.
-# Logic Expression Parser
-
-A Swift package for parsing, manipulating, and analyzing logical expressions. This tool provides functionality for both generating truth tables from logical expressions and creating minimal logical formulas from truth tables.
-
-## Features
-
-- Parse logical expressions with support for:
-  - AND (`*`), OR (`+`), NOT (`~`) operators
-  - Parentheses for grouping
-  - Variable names
-  - Multiple outputs
-- Generate truth tables from logical expressions
-- Create minimal logical formulas from truth tables
-- Simplify logical expressions using:
-  - Idempotent Law (A + A = A)
-  - Absorption Law (A + AB = A)
-  - Complement Law (A + ~A = 1)
-  - De Morgan's Laws (~(A + B) = ~A * ~B)
-
-## Command Line Tool Usage
-
-The package provides a command-line tool `lparser` with two main commands:
-
-### 1. Generate Truth Table (`table`)
-
-Convert a logical expression to a truth table:
